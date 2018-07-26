@@ -142,8 +142,15 @@ function rocket_minify_files( $buffer, $extension ) {
 	}
 
 	if ( 'js' === $extension ) {
-		$minify_header_url = get_rocket_minify_url( $files['header'], $extension );
-		$minify_url        = get_rocket_minify_url( $files['footer'], $extension );
+		$minify_header_url = "";
+		$minify_url = "";
+		if( isset( $files['header'] ) && ! empty( $files['header'] ) ) {
+			$minify_header_url = get_rocket_minify_url( $files['header'], $extension );
+		}
+
+		if( isset( $files['footer'] ) && ! empty( $files['footer'] ) ) {
+			$minify_url        = get_rocket_minify_url( $files['footer'], $extension );
+		}
 
 		if ( ! $minify_header_url && ! $minify_url ) {
 			return $original_buffer;
@@ -153,12 +160,17 @@ function rocket_minify_files( $buffer, $extension ) {
 			$buffer = str_replace( $external_js_file, '', $buffer );
 		}
 
-		$minify_header_tag = '<script src="' . $minify_header_url . '" data-minify="1"></script>';
+		$minify_header_tag = "";
+		if( ! empty( $minify_header_url ) ) {
+			$minify_header_tag = '<script src="' . $minify_header_url . '" data-minify="1"></script>';
+		}
 		$buffer            = preg_replace( '/<head(.*)>/U', '<head$1>' . implode( '', $external_js_files ) . $minify_header_tag, $buffer, 1 );
 
-		$minify_tag = '<script src="' . $minify_url . '" data-minify="1"></script>';
+		$minify_tag = "";
+		if( ! empty( $minify_url ) ) {
+			$minify_tag = '<script src="' . $minify_url . '" data-minify="1"></script>';
+		}
 		return str_replace( '</body>', $minify_tag . '</body>', $buffer );
-
 	}
 
 	if ( 'css' === $extension ) {
